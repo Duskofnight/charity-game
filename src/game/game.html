@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>Jump Knight</title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -23,7 +23,7 @@
             physics: {
                 default: 'arcade',
                 arcade: {
-                    gravity: { y: 300 },
+                    gravity: { y: 1000 },
                     debug: false
                 }
             },
@@ -53,20 +53,31 @@
             this.load.image('ground', 'assets/platform.png');
             this.load.spritesheet('coin', 'assets/coin.png', {frameWidth: 16, frameHeight: 16});
             this.load.image('bomb', 'assets/bomb.png');
+            this.load.audio('bgm', 'assets/bgm.mp3');
             this.load.spritesheet('character', 'assets/characters.png', {frameWidth: 32, frameHeight: 33});
         }
 
         function create() {
             this.add.image(0, 0, 'sky').setOrigin(0, 0).setDisplaySize(1920, 1080);
             this.add.image(0, 0, 'background').setOrigin(0, 0).setDisplaySize(1920, 1080);
-
+            let music = this.sound.add('bgm');
+            music.play({loop: true});
             platforms = this.physics.add.staticGroup();
 
-            platforms.create(960, 790, 'ground').setOrigin(0.5, 1).setScale(5, 1).refreshBody();
+            platforms.create(960, 990, 'ground').setOrigin(0.5, 1).setScale(5, 2).refreshBody();
             platforms.create(600, 400, 'ground');
             platforms.create(50, 250, 'ground');
-            platforms.create(750, 220, 'ground');
+            platforms.create(750, 180, 'ground');
+            platforms.create(500, 600, 'ground');
             platforms.create(1000, 500, 'ground');
+            platforms.create(1500, 700, 'ground');
+            platforms.create(80, 760, 'ground');
+            platforms.create(1900, 550, 'ground');
+            platforms.create(1800, 250, 'ground');
+            platforms.create(700, 830, 'ground');
+            platforms.create(1500, 400, 'ground');
+            platforms.create(1100, 300, 'ground');
+            platforms.create(10, 460, 'ground');
 
             player = this.physics.add.sprite(100, 450, 'character');
             player.setScale(2);
@@ -112,7 +123,7 @@
             coins = this.physics.add.group({
                 key: 'coin',
                 repeat: coinCount -1,
-                setXY: { x: 12, y: 0, stepX: 70 }
+                setXY: { x: 100, y: 0, stepX: 150 }
             });
 
             coins.children.iterate(function (child) {
@@ -150,7 +161,7 @@
             }
 
             if (spaceKey.isDown && player.body.touching.down) {
-                player.setVelocityY(-330);
+                player.setVelocityY(-600);
                 player.anims.play('jump', true);
             }
 
@@ -164,18 +175,18 @@
     if (coins.countActive(true) === 0) {
         level += 1;
         levelText.setText('Level: ' + level);
-        coinCount += 1;
+        coinCount += 4;
 
         coins.clear(true, true);
 
         coins = this.physics.add.group({
             key: 'coin',
             repeat: coinCount - 1,
-            setXY: { x: 12, y: 0, stepX: 70 }
+            setXY: { x: 20, y: 0, stepX: 70 }
         });
 
         coins.children.iterate(function (child) {
-            child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+            child.setBounceY(Phaser.Math.FloatBetween(0.01, 0.02));
             child.setScale(2);
         });
 
@@ -189,6 +200,7 @@
         bomb.setCollideWorldBounds(true);
         bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
         bomb.allowGravity = false;
+        bomb.setScale(2);
     }
 }
 
