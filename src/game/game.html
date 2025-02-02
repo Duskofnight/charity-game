@@ -63,23 +63,22 @@
             let music = this.sound.add('bgm');
             music.play({loop: true});
             platforms = this.physics.add.staticGroup();
-
             platforms.create(960, 990, 'ground').setOrigin(0.5, 1).setScale(5, 2).refreshBody();
             platforms.create(600, 400, 'ground');
-            platforms.create(50, 250, 'ground');
+            platforms.create(150, 250, 'ground');
             platforms.create(750, 180, 'ground');
-            platforms.create(500, 600, 'ground');
-            platforms.create(1000, 500, 'ground');
+            platforms.create(500, 650, 'ground');
+            platforms.create(1000, 550, 'ground');
             platforms.create(1500, 700, 'ground');
-            platforms.create(80, 760, 'ground');
+            platforms.create(80, 780, 'ground');
             platforms.create(1900, 550, 'ground');
             platforms.create(1800, 250, 'ground');
-            platforms.create(700, 830, 'ground');
+            platforms.create(950, 800, 'ground');
             platforms.create(1500, 400, 'ground');
             platforms.create(1100, 300, 'ground');
-            platforms.create(10, 460, 'ground');
+            platforms.create(10, 510, 'ground');
 
-            player = this.physics.add.sprite(100, 450, 'character');
+            player = this.physics.add.sprite(100, 850, 'character');
             player.setScale(2);
 
             player.setBounce(0.1);
@@ -123,7 +122,7 @@
             coins = this.physics.add.group({
                 key: 'coin',
                 repeat: coinCount -1,
-                setXY: { x: 100, y: 0, stepX: 150 }
+                setXY: { x: Phaser.Math.Between(100, 800), y: Phaser.Math.Between(200, 800), stepX: 70 }
             });
 
             coins.children.iterate(function (child) {
@@ -166,7 +165,7 @@
             }
 
         }
-        function collectCoin(player, coin) {
+    function collectCoin(player, coin) {
     coin.disableBody(true, true);
 
     score += 10;
@@ -175,14 +174,13 @@
     if (coins.countActive(true) === 0) {
         level += 1;
         levelText.setText('Level: ' + level);
-        coinCount += 4;
 
         coins.clear(true, true);
 
         coins = this.physics.add.group({
             key: 'coin',
-            repeat: coinCount - 1,
-            setXY: { x: 20, y: 0, stepX: 70 }
+            repeat: coinCount,
+            setXY: { x: Phaser.Math.Between(200, 600), y: Phaser.Math.Between(100, 900), stepX: 70 }
         });
 
         coins.children.iterate(function (child) {
@@ -192,7 +190,7 @@
 
         this.physics.add.collider(coins, platforms);
         this.physics.add.overlap(player, coins, collectCoin, null, this);
-
+        
         var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
 
         var bomb = bombs.create(x, 16, 'bomb');
@@ -208,8 +206,6 @@
             this.physics.pause();
 
             player.setTint(0xff0000);
-
-            player.anims.play('turn');
 
             gameOver = true;
         }
