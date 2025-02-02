@@ -5,11 +5,10 @@ import axios from "axios";
 function App() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [donation, setDonation] = useState(0);
+    const [donation, setDonation] = useState();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        alert(`Thanks ${username} for donating $${donation}!`);
 
         const user = {
             username,
@@ -18,14 +17,15 @@ function App() {
         };
 
         try {
-            const response = await axios.post(
-                "http://localhost:3001/donate",
-                user
-            );
+            // const response = await axios.post(
+            //     "http://localhost:3001/donate",
+            //     user
+            // );
 
-            if (response.status === 200) {
-                window.location.href = "/game-page";
-            }
+            // if (response.status === 200) {
+            //     window.location.href = "/game-page";
+            // }
+            window.location.href = "/game.html";
             setDonation("");
             setUsername("");
             setDonation("");
@@ -38,7 +38,7 @@ function App() {
             <br></br>
             <form onSubmit={handleSubmit}>
                 <img src="../assets/logo.png" alt="logo" />
-                <input
+                {/* <input
                     type="text"
                     name="username"
                     value={username}
@@ -51,7 +51,7 @@ function App() {
                     value={password}
                     placeholder="Password"
                     onChange={(e) => setPassword(e.target.value)}
-                />
+                /> */}
                 <input
                     type="number"
                     name="donation"
