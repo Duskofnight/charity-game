@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>Jump Knight</title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -23,7 +23,7 @@
             physics: {
                 default: 'arcade',
                 arcade: {
-                    gravity: { y: 300 },
+                    gravity: { y: 1000 },
                     debug: false
                 }
             },
@@ -42,7 +42,6 @@
         var coins;
         var bombs;
         var platforms;
-        var gameOver = false;
         var coinCount = 12;
         var level = 1;
         var levelText;
@@ -50,25 +49,36 @@
         function preload() {
             this.load.image('sky', 'assets/Background_0.png');
             this.load.image('background', 'assets/Background_3.png');
-            this.load.image('ground', 'assets/platform.png');
+            this.load.image('ground', 'assets/ground.png', {frameWidth: 16, frameHeight: 16});
+            this.load.image('platform', 'assets/platform.png', {frameWidth: 16, frameHeight: 16});
             this.load.spritesheet('coin', 'assets/coin.png', {frameWidth: 16, frameHeight: 16});
             this.load.image('bomb', 'assets/bomb.png');
+            this.load.audio('bgm', 'assets/bgm.mp3');
             this.load.spritesheet('character', 'assets/characters.png', {frameWidth: 32, frameHeight: 33});
         }
 
         function create() {
             this.add.image(0, 0, 'sky').setOrigin(0, 0).setDisplaySize(1920, 1080);
             this.add.image(0, 0, 'background').setOrigin(0, 0).setDisplaySize(1920, 1080);
-
+            let music = this.sound.add('bgm');
+            music.play({loop: true});
             platforms = this.physics.add.staticGroup();
+            platforms.create(960, 990, 'ground').setOrigin(0.5, 1).setScale(5, 2).refreshBody();
+            platforms.create(600, 400, 'platform');
+            platforms.create(150, 250, 'platform');
+            platforms.create(750, 180, 'platform');
+            platforms.create(500, 650, 'platform');
+            platforms.create(1000, 550, 'platform');
+            platforms.create(1500, 700, 'platform');
+            platforms.create(80, 780, 'platform');
+            platforms.create(1900, 550, 'platform');
+            platforms.create(1800, 250, 'platform');
+            platforms.create(950, 800, 'platform');
+            platforms.create(1500, 400, 'platform');
+            platforms.create(1100, 300, 'platform');
+            platforms.create(10, 510, 'platform');
 
-            platforms.create(960, 790, 'ground').setOrigin(0.5, 1).setScale(5, 1).refreshBody();
-            platforms.create(600, 400, 'ground');
-            platforms.create(50, 250, 'ground');
-            platforms.create(750, 220, 'ground');
-            platforms.create(1000, 500, 'ground');
-
-            player = this.physics.add.sprite(100, 450, 'character');
+            player = this.physics.add.sprite(100, 850, 'character');
             player.setScale(2);
 
             player.setBounce(0.1);
@@ -112,7 +122,7 @@
             coins = this.physics.add.group({
                 key: 'coin',
                 repeat: coinCount -1,
-                setXY: { x: 12, y: 0, stepX: 70 }
+                setXY: { x: Phaser.Math.Between(100, 800), y: Phaser.Math.Between(200, 800), stepX: 70 }
             });
 
             coins.children.iterate(function (child) {
@@ -124,8 +134,8 @@
             this.physics.add.collider(coins, platforms);
 
             this.physics.add.overlap(player, coins, collectCoin, null, this);
-            scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#fff' });
-            levelText = this.add.text(16, 50, 'Level: 1', { fontSize: '32px', fill: '#fff' })
+            scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff', fontFamily: 'Trattatello' });
+            levelText = this.add.text(16, 50, 'Level: 1', { fontSize: '32px', fill: '#fff', fontFamily: 'Trattatello' });
             bombs = this.physics.add.group();
 
             this.physics.add.collider(bombs, platforms);
@@ -135,12 +145,12 @@
 
         function update() {
             if (aKey.isDown) {
-                player.setVelocityX(-200)
+                player.setVelocityX(-300)
                 player.anims.play('run', true);
                 player.flipX = true;
             }
             else if (dKey.isDown) {
-                player.setVelocityX(200)
+                player.setVelocityX(300)
                 player.anims.play('run', true);
                 player.flipX = false;
             }
@@ -150,45 +160,45 @@
             }
 
             if (spaceKey.isDown && player.body.touching.down) {
-                player.setVelocityY(-330);
+                player.setVelocityY(-600);
                 player.anims.play('jump', true);
             }
 
         }
-        function collectCoin(player, coin) {
+    function collectCoin(player, coin) {
     coin.disableBody(true, true);
 
-    score += 10;
+    score += 100;
     scoreText.setText('Score: ' + score);
         
     if (coins.countActive(true) === 0) {
         level += 1;
         levelText.setText('Level: ' + level);
-        coinCount += 1;
 
         coins.clear(true, true);
 
         coins = this.physics.add.group({
             key: 'coin',
-            repeat: coinCount - 1,
-            setXY: { x: 12, y: 0, stepX: 70 }
+            repeat: coinCount,
+            setXY: { x: Phaser.Math.Between(200, 600), y: Phaser.Math.Between(100, 900), stepX: 70 }
         });
 
         coins.children.iterate(function (child) {
-            child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+            child.setBounceY(Phaser.Math.FloatBetween(0.01, 0.02));
             child.setScale(2);
         });
 
         this.physics.add.collider(coins, platforms);
         this.physics.add.overlap(player, coins, collectCoin, null, this);
-
+        
         var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
 
         var bomb = bombs.create(x, 16, 'bomb');
         bomb.setBounce(1);
         bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+        bomb.setVelocity(Phaser.Math.Between(-100, 400), 20);
         bomb.allowGravity = false;
+        bomb.setScale(2);
     }
 }
 
@@ -196,12 +206,29 @@
             this.physics.pause();
 
             player.setTint(0xff0000);
-
-            player.anims.play('turn');
-
-            gameOver = true;
+            gameOver.call(this);
         }
+    
+        function gameOver() {
+    this.physics.pause();
+    var gameOverText = this.add.text(960, 400, 'You Died', {
+        fontSize: '200px',
+        fill: '#ff0000',
+        fontFamily: 'Chalkduster',
+    }).setOrigin(0.5);
 
+    var tryAgainButton = this.add.text(960, 550, 'Try Again', {
+        fontSize: '52px',
+        fill: 'black',
+        fontFamily: 'Chalkduster',
+        backgroundColor: 'white',
+        padding: { x: 20, y: 10 }
+    }).setOrigin(0.5).setInteractive();
+    tryAgainButton.input.cursor = 'pointer';
+    tryAgainButton.on('pointerdown', () => {
+        this.scene.restart();
+    });
+}
     </script>
 
 </body>
